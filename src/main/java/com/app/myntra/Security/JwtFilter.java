@@ -35,6 +35,11 @@ protected void doFilterInternal(
     HttpServletResponse response,
     FilterChain filterChain
 ) throws ServletException, IOException {
+    String path = request.getRequestURI();
+    if (path.startsWith("/auth") || path.startsWith("/swagger") || path.startsWith("/v3/api-docs") || path.startsWith("/orders")) {
+        filterChain.doFilter(request, response);
+        return;
+    }
 
     final String authHeader = request.getHeader("Authorization");
 

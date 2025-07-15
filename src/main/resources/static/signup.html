@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sign Up - Myntra Clone</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-sm">
+    <h2 class="text-2xl font-bold mb-4 text-pink-600 text-center">Sign Up</h2>
+
+    <form id="signupForm">
+      <label class="block mb-2 text-sm font-medium text-gray-700">Username</label>
+      <input type="text" id="username" required class="w-full px-3 py-2 mb-4 border rounded" />
+
+      <label class="block mb-2 text-sm font-medium text-gray-700">Email</label>
+      <input type="email" id="email" required class="w-full px-3 py-2 mb-4 border rounded" />
+
+      <label class="block mb-2 text-sm font-medium text-gray-700">Phone Number</label>
+      <input type="text" id="phoneNumber" required class="w-full px-3 py-2 mb-4 border rounded" />
+
+      <label class="block mb-2 text-sm font-medium text-gray-700">Password</label>
+      <input type="password" id="password" required class="w-full px-3 py-2 mb-4 border rounded" />
+
+      <button type="submit" class="bg-pink-500 w-full text-white py-2 rounded hover:bg-pink-600">
+        Sign Up
+      </button>
+    </form>
+
+    <p class="text-sm mt-4 text-center">
+      Already have an account?
+      <a href="login.html" class="text-pink-600 hover:underline">Login</a>
+    </p>
+  </div>
+
+  <script>
+    document.getElementById("signupForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const data = {
+        username: document.getElementById("username").value.trim(),
+        password: document.getElementById("password").value.trim(),
+        email: document.getElementById("email").value.trim(),
+        phoneNumber: document.getElementById("phoneNumber").value.trim()
+      };
+
+      fetch("http://localhost:8080/auth/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Signup failed");
+        return res.text(); // backend returns plain text
+      })
+      .then(() => {
+        alert("Signup successful! Please log in.");
+        window.location.href = "login.html";
+      })
+      .catch(err => alert("Error: " + err.message));
+    });
+  </script>
+
+</body>
+</html>

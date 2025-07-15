@@ -18,7 +18,7 @@ public class ProductController {
     @Autowired
     private ProductRepository productRepository;
 
-    // Fetch all products without paging (if needed)
+    // Fetch all products
     @GetMapping
     public List<Product> getAllProducts() {
         return productRepository.findAll();
@@ -32,7 +32,7 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    //paginated and sorted products
+    // Paginated and sorted products
     @GetMapping("/paged")
     public Page<Product> getPagedProducts(
         @PageableDefault(size = 5, sort = "price", direction = org.springframework.data.domain.Sort.Direction.ASC)
@@ -41,11 +41,14 @@ public class ProductController {
         return productRepository.findAll(pageable);
     }
 
-    // Add new product
-    @PostMapping
-    public Product createProduct(@RequestBody Product product) {
-        return productRepository.save(product);
-    }
+    // ✅ FIXED: Add new product (works with application/json and application/json;charset=UTF-8)
+@PostMapping
+public Product createProduct(@RequestBody Product product) {
+    System.out.println("✅ Received Product: " + product);
+    return productRepository.save(product);
+}
+
+
 
     // Update product
     @PutMapping("/{id}")

@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Cart - Myntra Clone</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+
+  <!-- Navbar -->
+  <header class="bg-white shadow">
+    <div class="w-full px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center">
+        <img src="myntra-logo.png" alt="Myntra Logo" class="h-8 w-8 mr-2" />
+        <h1 class="text-xl font-bold text-pink-600">Myntra</h1>
+      </div>
+      <nav class="space-x-4">
+        <a href="index.html" class="text-gray-700 hover:text-pink-500">Home</a>
+        <a href="product-list.html" class="text-gray-700 hover:text-pink-500">Products</a>
+        <a href="cart.html" class="text-gray-700 hover:text-pink-500 font-semibold">Cart</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Cart Section -->
+  <main class="max-w-5xl mx-auto px-4 py-10">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">My Cart</h2>
+    <div id="cartItems" class="space-y-6"></div>
+
+    <!-- Total & Checkout -->
+    <div class="mt-10 text-right">
+      <p class="text-lg font-semibold">Total: ₹<span id="totalAmount">0</span></p>
+      <button id="placeOrderBtn" class="mt-4 bg-pink-500 text-white py-2 px-4 rounded hover:bg-pink-600">
+        Place Order
+      </button>
+    </div>
+  </main>
+
+  <script>
+    const userId = localStorage.getItem("userId");
+    const token = localStorage.getItem("token");
+    const cartItemsContainer = document.getElementById("cartItems");
+    const totalAmountSpan = document.getElementById("totalAmount");
+
+    if (!userId || !token) {
+      alert("Please login first.");
+      window.location.href = "login.html";
+    }
+
+    function fetchCart() {
+      fetch(`http://localhost:8080/cart?userId=${userId}`, {
+        headers: { "Authorization": `Bearer ${token}` }
+      })
+      .then(res => res.json())
+      .then(data => renderCart(data))
+      .catch(err => alert("Error fetching cart: " + err.message));
+    }
+
+    function renderCart(cartItems) {
+      cartItemsContainer.innerHTML = "";
+      let total = 0;
+
+      cartItems.forEach(item => {
+        const product = item.product;
+        const itemTotal = product.price * item.quantity;
+        total += itemTotal;
+
+        const card = document.createElement("div");
+        card.className = "bg-white p-4 rounded shadow flex justify-between items-center";
+
+        card.innerHTML = `
+          <div>
+            <h3 class="font-semibold text-gray-800">${product.brand} - ${product.name}</h3>
+            <p class="text-sm text-gray-500">Price: ₹${product.price}</p>
+            <p class="text-sm text-gray-500">Category: ${product.category}</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-sm">Qty: ${item.quantity}</span>
+            <button class="text-red-500 text-sm underline" onclick="removeItem(${item.id})">Remove</button>
+          </div>
+        `;
+
+        cartItemsContainer.appendChild(card);
+      });
+
+      totalAmountSpan.innerText = total.toFixed(2);
+    }
+
+    function removeItem(cartItemId) {
+      fetch(`http://localhost:8080/cart/${cartItemId}`, {
+        method: "DELETE",
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      })
+      .then(() => fetchCart())
+      .catch(err => alert("Failed to remove item"));
+    }
+
+    document.getElementById("placeOrderBtn").addEventListener("click", () => {
+      fetch("http://localhost:8080/orders", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId: userId })
+      })
+      .then(res => {
+        if (!res.ok) throw new Error("Order failed");
+        return res.json(); // ✅ Expecting JSON now
+      })
+      .then(data => {
+        alert("✅ " + data.message + "\n🧾 Order ID: " + data.orderId);
+        fetchCart(); // Refresh cart after order placed
+      })
+      .catch(err => alert("❌ " + err.message));
+    });
+
+    // Load cart on page load
+    fetchCart();
+  </script>
+
+</body>
+</html>

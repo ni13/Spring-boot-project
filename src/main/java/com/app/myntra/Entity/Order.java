@@ -1,16 +1,14 @@
 package com.app.myntra.Entity;
 
 import jakarta.persistence.*;
-import java.time.LocalDate;
-
 @Entity
-@Table(name = "orders") // "order" is a reserved word in SQL
+@Table(name = "orders") 
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private LocalDate orderDate;
+
     private String status;
     private double totalAmount;
 
@@ -22,8 +20,8 @@ public Order() {
     }
     
 
-    public Order(LocalDate orderDate, String status, double totalAmount, User user) {
-        this.orderDate = orderDate;
+    public Order(String status, double totalAmount, User user) {
+
         this.status = status;
         this.totalAmount = totalAmount;
         this.user = user;
@@ -37,13 +35,6 @@ public Order() {
         this.id = id;
     }
 
-    public LocalDate getOrderDate() {
-        return orderDate;
-    }
-
-    public void setOrderDate(LocalDate orderDate) {
-        this.orderDate = orderDate;
-    }
 
     public String getStatus() {
         return status;
@@ -69,5 +60,5 @@ public Order() {
         this.user = user;
     }
 
-    // Getters and Setters
+    
 }

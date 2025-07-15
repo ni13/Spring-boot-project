@@ -1,6 +1,6 @@
 package com.app.myntra.Entity;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -17,13 +17,15 @@ public class Product {
     private double price;
     private String category;
 
+    @JsonIgnore // Prevent JSON errors when cartItems is not included in request
     @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference // Product owns the relationship with Cart
     private List<Cart> cartItems;
 
+    // No-arg constructor required by JPA
     public Product() {
     }
 
+    // All-arg constructor
     public Product(String name, String brand, double price, String category, List<Cart> cartItems) {
         this.name = name;
         this.brand = brand;
@@ -32,7 +34,7 @@ public class Product {
         this.cartItems = cartItems;
     }
 
-    // Getters and Setters
+    // Getters and setters
     public Long getId() {
         return id;
     }
@@ -79,5 +81,16 @@ public class Product {
 
     public void setCartItems(List<Cart> cartItems) {
         this.cartItems = cartItems;
+    }
+
+    @Override
+    public String toString() {
+        return "Product{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", brand='" + brand + '\'' +
+                ", price=" + price +
+                ", category='" + category + '\'' +
+                '}';
     }
 }

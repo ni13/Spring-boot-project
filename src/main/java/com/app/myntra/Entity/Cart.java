@@ -1,6 +1,6 @@
 package com.app.myntra.Entity;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,14 +13,14 @@ public class Cart {
     private int quantity;
     private double price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "product_id")
-    @JsonBackReference // child side of Product-Cart
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "cartItems"}) // ✅ Exclude recursion and proxy errors
     private Product product;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "user_id")
-    @JsonBackReference // child side of User-Cart
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler", "cartItems"}) // ✅ same for user
     private User user;
 
     public Cart() {
